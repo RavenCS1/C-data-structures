@@ -2,23 +2,26 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Clean C implementations** + **selected examples** from:
+**Clean, efficient C implementations** from **CLRS (Cormen)**:
+
+## 📺 **Must-Watch: Charles Cabergs "Advanced C"**  
+YouTube series — [Charles Cberg Advanced C](https://www.youtube.com/@CharlesCberg)
 
 ## 📚 **Recommended Books** (read **originals** in English!)
+- *Introduction to Algorithms* by Cormen et al. (CLRS) — **data structures source**  
 - *Modern C* by Jens Gustedt  
 - *Expert C Programming* by Peter van der Linden  
 
-> **These books are MUST-READ for serious C programmers.**  
-> Way more interesting + harder examples than this repo!
+> **These are MUST-READS for serious C programmers.**
 
-## 📋 Implemented Modules
-| Module | Complexity |
-|--------|------------|
-| [Binary Tree](./Binary_tree) | O(log n) |
-| [Red-Black Tree](./Red_black_tree) | O(log n) |
-| [Doubly Linked List](./Doubly_linked_list) | O(1) |
-| [Heap](./Heap) | O(log n) |
-| [Huffman Coding](./Huffman_coding) | O(n log n) |
+## 📋 Implemented Data Structures (from CLRS)
+| Module | Complexity | Description |
+|--------|------------|-------------|
+| [Binary Tree](./Binary_tree) | O(log n) | Balanced tree operations |
+| [Red-Black Tree](./Red_black_tree) | O(log n) | Self-balancing BST |
+| [Doubly Linked List](./Doubly_linked_list) | O(1) | Bidirectional traversal |
+| [Heap](./Heap) | O(log n) | Priority queue |
+| [Huffman Coding](./Huffman_coding) | O(n log n) | Optimal prefix codes |
 
 ## Quick Build (from root)
 
