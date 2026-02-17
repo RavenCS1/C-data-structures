@@ -10,11 +10,11 @@
 - *Expert C Programming* by Peter van der Linden  
 
 ## **Other Recommendations**  
-[Jens Gustedt's Blog – programming in modern C](https://gustedt.wordpress.com/)
+- [Jens Gustedt's Blog – programming in modern C](https://gustedt.wordpress.com/)
 
-[Charles Cabergs Advanced C](https://www.youtube.com/watch?v=g7CCaRwRVBQ&list=PL71Y0EmrppR0KyZvQWj63040UEzKQU7n8)
+- [Charles Cabergs Advanced C](https://www.youtube.com/watch?v=g7CCaRwRVBQ&list=PL71Y0EmrppR0KyZvQWj63040UEzKQU7n8)
 
-[Daniel Hirsch - YouTube](https://www.youtube.com/@HirschDaniel)
+- [Daniel Hirsch - YouTube](https://www.youtube.com/@HirschDaniel)
 
 ## Implemented Data Structures (from CLRS)
 | Module | Complexity | Description |
