@@ -1,81 +1,71 @@
 #include "tree.h"
-#include <complex.h>
 
-int rand_i(int a, int b){
-    return (a + rand() % (b - a + 1));
+void print_leaf(node* x){
+    if(x){
+        (void) printf("Adress of the node: %p\n", (void *)x);
+        (void) printf("Value of the key: %" PRId32 "\n", x -> key);
+        (void) printf("Adress of the parent: %p\n", (void *)(x -> parent));
+        (void) printf("Adress of the left son: %p\n", (void *)(x -> left));
+        (void) printf("Adress of the right son: %p\n\n", (void *)(x -> right));
+    }
+    else (void) printf("Invalid pointer! Couldn't print out pieces of information about a node.\n");
+    return;
 }
 
 void inorder_tree_walk(node* x){
     if(x){
         inorder_tree_walk(x -> left);
-        printf("Adres: %p\n", x);
-        printf("Wartość klucza: %d\n", x -> key);
-        printf("Adres rodzica: %p\n", x -> parent);
-        printf("Adres lewego syna: %p\n", x -> left);
-        printf("Adres prawego syna: %p\n\n", x -> right);
+        print_leaf(x);
         inorder_tree_walk(x -> right);
     }
+    return;
 }
 
 void preorder_tree_walk(node* x){
     if(x){
-        printf("Adres: %p\n", x);
-        printf("Wartość klucza: %d\n", x -> key);
-        printf("Adres rodzica: %p\n", x -> parent);
-        printf("Adres lewego syna: %p\n", x -> left);
-        printf("Adres prawego syna: %p\n\n", x -> right);
+        print_leaf(x);
         preorder_tree_walk(x -> left);
         preorder_tree_walk(x -> right);
     }
+    return;
 }
 
 void postorder_tree_walk(node* x){
     if(x){
         postorder_tree_walk(x -> left);
         postorder_tree_walk(x -> right);
-        printf("Adres: %p\n", x);
-        printf("Wartość klucza: %d\n", x -> key);
-        printf("Adres rodzica: %p\n", x -> parent);
-        printf("Adres lewego syna: %p\n", x -> left);
-        printf("Adres prawego syna: %p\n\n", x -> right);
+        print_leaf(x);
     }
+    return;
 }
 
-node* tree_search(node* x, int k){
-    if(x || k == x -> key)
-        return x;
-    if(k < x -> key)
-        return tree_search(x -> left, k);
-    else
-        return tree_search(x -> right, k);
+node* tree_search(node* x, int32_t k){
+    if(x || k == x -> key) return x;
+    if(k < x -> key) return tree_search(x -> left, k);
+    else return tree_search(x -> right, k);
 }
 
 
-node* iterative_tree_search(node* x, int k){
+node* iterative_tree_search(node* x, int32_t k){
     while(x && k != x -> key){
-        if(k < x -> key)
-            x = x -> left;
-        else
-            x = x -> right;
+        if(k < x -> key) x = x -> left;
+        else x = x -> right;
    }
    return x;
 }
 
 node* tree_minimum(node* x){
-    while(x -> left)
-        x = x -> left;
+    while(x -> left) x = x -> left;
     return x;
 }
 
 node* tree_maximum(node* x){
-    while(x -> right)
-        x = x -> right;
+    while(x -> right) x = x -> right;
     return x;
 }
 
 node* tree_successor(node* x){
-    if(x -> right) 
-        return tree_minimum(x -> right);
+    if(x -> right) return tree_minimum(x -> right);
     node* y = x -> parent;
     while(y && x == y -> right){
         x = y;
@@ -85,8 +75,7 @@ node* tree_successor(node* x){
 }
 
 node* tree_predecessor(node* x){
-    if(x -> left)
-        return tree_maximum(x -> left);
+    if(x -> left) return tree_maximum(x -> left);
     node* y = x -> parent;
     while(y && x == y -> left){
         x = y;
@@ -96,54 +85,43 @@ node* tree_predecessor(node* x){
 }
 
 
-node* create(int k){
-    node* new = malloc(sizeof(node));
+node* create(int32_t k){
+    node* new = malloc(sizeof(*new));
     if(!new){
-        printf("Za mało pamięci na stercie!\n");
-        return 0;
+        (void) printf("Allocation of a new node was unfortunately unsuccesful!\n");
+        exit(EXIT_FAILURE);
     }
     new -> key = k;
-    new -> parent = new -> left = new -> right = 0;
+    new -> parent = new -> left = new -> right = nullptr;
     return new;
 }
 
 void tree_insert(node** root, node* z){
-    node* y = 0;
+    node* y = nullptr;
     node* x = *root;
     while(x){
         y = x;
-        if(z -> key < x -> key)
-            x = x -> left;
-        else
-            x = x -> right;
+        if(z -> key < x -> key) x = x -> left;
+        else x = x -> right;
     }
     z -> parent = y;
-    if(!y)
-        *root = z;
-    else if(z -> key < y -> key)
-        y -> left = z;
-    else
-        y -> right = z;
+    if(!y) *root = z;
+    else if(z -> key < y -> key) y -> left = z;
+    else y -> right = z;
     return;
 }
 
 void transplant(node** root, node* u, node* v){
-    if(!(u -> parent))
-        *root = v;
-    else if(u == u -> parent -> left)
-        u -> parent -> left = v;
-    else
-        u -> parent -> right = v;
-   if(v)
-        v -> parent = u -> parent;
+    if(!(u -> parent)) *root = v;
+    else if(u == u -> parent -> left) u -> parent -> left = v;
+    else u -> parent -> right = v;
+    if(v) v -> parent = u -> parent;
     return;
 }
 
 void tree_delete(node** root, node* z){
-    if(!(z -> left))
-        transplant(root, z, z -> right);
-    else if(!(z -> right))
-        transplant(root, z, z -> left);
+    if(!(z -> left)) transplant(root, z, z -> right);
+    else if(!(z -> right)) transplant(root, z, z -> left);
     else{
         node* y = tree_minimum(z -> right);
         if(y -> parent != z){
@@ -155,46 +133,35 @@ void tree_delete(node** root, node* z){
         y -> left = z -> left;
         y -> left -> parent = y;
     }
-    z -> left = z -> right = z -> parent = 0;
+    z -> left = z -> right = z -> parent = nullptr;
     free(z);
     return;
 }
 
 void free_tree(node** root){ 
     node* x = *root;
-    node* min = 0;
-    node* max = 0;
+    node* min = nullptr;
+    node* max = nullptr;
     while(((min = tree_minimum(x)) != x) && min){
-        printf("Zwalniam następujący element: %p\n", min);
-        printf("Wartość klucza: %d\n", min -> key);
-        printf("Adres rodzica: %p\n", min -> parent);
-        printf("Adres lewego syna: %p\n", min -> left);
-        printf("Adres prawego syna: %p\n\n", min -> right);
+        (void) printf("Dealocation of a node:\n");
+        print_leaf(min);
         min -> parent -> left = min -> right;
-        if(min -> right)
-            min -> right -> parent = min -> parent;
-        min -> left = min -> right = min -> parent = 0;
+        if(min -> right) min -> right -> parent = min -> parent;
+        memset(min, 0, sizeof(*min));
         free(min);
     }
     while(((max = tree_maximum(x)) != x) && max){
-        printf("Zwalniam następujący element: %p\n", max);
-        printf("Wartość klucza: %d\n", max -> key);
-        printf("Adres rodzica: %p\n", max -> parent);
-        printf("Adres lewego syna: %p\n", max -> left);
-        printf("Adres prawego syna: %p\n\n", max -> right);
+        (void) printf("Dealocation of a node:\n");
+        print_leaf(max);
         max -> parent -> right = max -> left;
-        if(max -> left)
-            max -> left -> parent = max -> parent;
-        max -> left = max -> right = max -> parent = 0;
+        if(max -> left) max -> left -> parent = max -> parent;
+        memset(max, 0, sizeof(*max));
         free(max);
     }
-    printf("Zwalniam następujący element: %p\n", x);
-    printf("Wartość klucza: %d\n", x -> key);
-    printf("Adres rodzica: %p\n", x -> parent);
-    printf("Adres lewego syna: %p\n", x -> left);
-    printf("Adres prawego syna: %p\n", x -> right);
-    x -> left = x -> right = 0;
+    (void) printf("Dealocation of a node:\n");
+    print_leaf(x);
+    memset(x, 0, sizeof(*x));
     free(x);
-    *root = 0;
+    *root = nullptr;
     return;
 }

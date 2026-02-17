@@ -1,21 +1,30 @@
 #include "huffman.h"
 
-int main(void){
-    char* inputfile = "input.txt";
-    char* outputbinary = "output.bin";
-    char* outputfile = "output.txt";
-    FILE* file = fopen(inputfile, "r");
-    if(!file){
-        printf("Nie udało się otworzyć pliku!\n");
+int main(int argc, char* argv[argc + 1]){
+    if(argc != 2){
+        (void) printf("Inappropriate usage of the program!\n");
+        (void) printf("Appropriate usage: ./Huffman_coding input.txt\n\n");
         exit(EXIT_FAILURE);
     }
-    int n = 0;
+
+    char* input_file = argv[1];
+    char* output_binary = "output.bin";
+    char* output_file = "output.txt";
+
+    FILE* input = fopen(input_file, "r");
+    if(!input){
+        (void) printf("Error - it was not possible to open the input txt file to encryption!\n\n");
+        exit(EXIT_FAILURE);
+    }
+
+    int32_t n = 0;
     bool flag = false;
     char character;
-    leaf* tab = 0;
-    while((character = getc(file)) != EOF){
+    leaf* tab = nullptr;
+
+    while((character = getc(input)) != EOF){
         flag = false;
-        for(int i = 0; i < n; ++i){
+        for(int32_t i = 0; i < n; ++i){
             if(tab[i].sign == character){
                 tab[i].counter += 1;
                 flag = true;
@@ -24,94 +33,104 @@ int main(void){
         }
         if(!flag){
             n++;
-            tab = realloc(tab, n * sizeof(*tab));
-            tab[n - 1] = (leaf){0, 0, 1, character};
+            tab = realloc(tab, n * sizeof(tab[0]));
+            tab[n - 1] = (leaf){nullptr, nullptr, 1, character};
         }
     }
-    fclose(file);
-    heap* holder = create_heap(n, tab);
-    printf("Na samym początku:\n\n");
-    print_heap(holder);
-    build_min_heap(holder);
-    printf("Zbudowany kopiec:\n\n");
-    print_heap(holder);
+
+    heap* handle = create_heap(n, tab);
+    (void) printf("At the beginning:\n\n");
+    print_heap(handle);
+
+    build_min_heap(handle);
+    (void) printf("Properly built heap:\n\n");
+    print_heap(handle);
+
     leaf* x, *y, *z;
-    x = y = z = 0;
-    for(int i = 1; i < n; ++i){
+    x = y = z = nullptr;
+
+    for(int32_t i = 1; i < n; ++i){
         z = malloc(sizeof(*z));
         if(!z){
-            printf("Nie udało się zamallocować węzła przy wyborze zachłannym!\n");
+            (void) printf("Allocation of a new leaf in a greedy algorithm was unfortunately unsucessful!\n\n");
             exit(EXIT_FAILURE);
         }
-        x = heap_extract_min(holder);
-        y = heap_extract_min(holder);
+        x = heap_extract_min(handle);
+        y = heap_extract_min(handle);
         z -> left = x;
         z -> right = y;
         z -> counter = x -> counter + y -> counter;
         z -> sign = '.';
-        min_heap_insert(holder, z);
+        min_heap_insert(handle, z);
         free(z);
     }
-    z = heap_extract_min(holder);
-    free_heap(&holder);
+
+    z = heap_extract_min(handle);
+    free_heap(&handle);
+
     char tabsign[n];
     char** tabcodes = malloc(n * sizeof(char*));
-    for(int i = 0; i < n; ++i)
-        tabcodes[i] = malloc((n + 1) * sizeof(char));
+    for(int32_t i = 0; i < n; ++i)
+        tabcodes[i] = malloc(sizeof(char[n + 1]));
+
     char buffer[n + 1];
-    int idx = 0;
-    treewalk(z, 0, buffer, tabsign, tabcodes, &idx);
-    for(int i = 0; i < n; ++i){
-        if(tabsign[i] != '\n')
-            printf("Litera: %c ", tabsign[i]);
-        else
-            printf("Litera: \\n ");
-        printf("kod: %s\n", tabcodes[i]);
+    int32_t idx = 0;
+
+    tree_walk(z, 0, buffer, tabsign, tabcodes, &idx);
+    for(int32_t i = 0; i < n; ++i){
+        if(tabsign[i] != '\n') (void) printf("Letter: %c ", tabsign[i]);
+        else (void) printf("Letter: \\n ");
+        (void) printf("Generated encryption: %s\n", tabcodes[i]);
     }
 
-    FILE* input = fopen(inputfile, "r");
-    if(!input){
-        printf("Nie udało się otworzyć pliku tekstowego do kodowania!\n");
-        exit(EXIT_FAILURE);
-    }
-    FILE* output = fopen(outputbinary, "wb");
+    FILE* output = fopen(output_binary, "wb");
     if(!output){
-        printf("Nie udało się otworzyć pliku binarnego do zapisu!\n");
+        (void) printf("Error - it was not possible to open the binary file to write the encryption!\n\n");
         exit(EXIT_FAILURE);
     }
-    fseek(input, 0, SEEK_END);
-    int input_length = ftell(input);
+
     rewind(input);
-    fwrite(&input_length, sizeof(int), 1, output);
-    int id;
-    char* code = 0;
+    fseek(input, 0, SEEK_END); // somewhere I read that SEEK_END macro has a glitch and can impose some problems
+    int32_t input_length = ftell(input);
+    rewind(input);
+    fwrite(&input_length, sizeof(int32_t), 1, output);
+
+    int32_t id;
+    char* code = nullptr;
     unsigned char buf = 0;
-    int bit_count = 0;
+    int32_t bit_count = 0;
     unsigned char bit;
+
     while((character = getc(input)) != EOF){
         id = -1;
-        for(int k = 0; k < n; ++k){
+        for(int32_t k = 0; k < n; ++k){
             if(tabsign[k] == character){ 
                 id = k; 
                 break; 
             }
         }
         code = tabcodes[id];
-        for(int j = 0; code[j] != '\0'; ++j){
+        for(int32_t j = 0; code[j] != '\0'; ++j){
             bit = code[j] - '0';
             write_bit(output, bit, &buf, &bit_count);
         }
     }
+
     if(bit_count > 0){
         buf <<= (8 - bit_count);
         fwrite(&buf, 1, 1, output);
     }
+
     fclose(input);
     fclose(output);
-    decode(z, outputbinary, outputfile);
-    for(int i = 0; i < n; ++i)
+
+    decode(z, output_binary, output_file);
+
+    for(int32_t i = 0; i < n; ++i)
         free(tabcodes[i]);
+
     free(tabcodes);
     free_tree(z);
-    return 0;
+
+    return EXIT_SUCCESS;
 }

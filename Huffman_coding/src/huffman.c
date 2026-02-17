@@ -1,17 +1,5 @@
 #include "huffman.h"
 
-int parent(int i){
-    return (i - 1) / 2;
-}
-
-int left(int i){
-    return 2 * i + 1;
-}
-
-int right(int i){
-    return 2 * i + 2;
-}
-
 void swap(leaf* a, leaf* b){
     leaf tmp = *a;
     *a = *b;
@@ -19,146 +7,139 @@ void swap(leaf* a, leaf* b){
     return;
 }
 
-void min_heapify(heap* holder, int i){
-    int l = left(i);
-    int r = right(i);
-    int smallest;
-    if((l < holder -> heap_size) && (holder -> tab[l].counter < holder -> tab[i].counter))
-        smallest = l;
-    else
-        smallest = i;
-    if((r < holder -> heap_size) && (holder -> tab[r].counter < holder -> tab[smallest].counter))
-        smallest = r;
+void min_heapify(heap* handle, int32_t i){
+    int32_t l = left(i);
+    int32_t r = right(i);
+    int32_t smallest;
+    if((l < handle -> heap_size) && (handle -> tab[l].counter < handle -> tab[i].counter)) smallest = l;
+    else smallest = i;
+    if((r < handle -> heap_size) && (handle -> tab[r].counter < handle -> tab[smallest].counter)) smallest = r;
     if(smallest != i){
-       swap(&(holder -> tab[i]), &(holder -> tab[smallest]));
-       min_heapify(holder, smallest);
+       swap(&(handle -> tab[i]), &(handle -> tab[smallest]));
+       min_heapify(handle, smallest);
     }
     return;
 }
 
-void build_min_heap(heap* holder){
-    holder -> heap_size = holder -> length;
-    for(int i = holder -> length / 2 - 1; i >= 0; i--)
-        min_heapify(holder, i);
+void build_min_heap(heap* handle){
+    handle -> heap_size = handle -> length;
+    for(int32_t i = handle -> length / 2 - 1; i >= 0; i--)
+        min_heapify(handle, i);
     return;
 }
 
-leaf* heap_extract_min(heap* holder){
-    leaf* tmp = 0;
-    if(holder -> heap_size < 1){
-        printf("Błąd - kopiec jest pusty!\n");
+leaf* heap_extract_min(heap* handle){
+    leaf* tmp = nullptr;
+    if(handle -> heap_size < 1){
+        (void) printf("Error - heap is currently empty!\n\n");
         tmp = malloc(sizeof(*tmp));
         if(!tmp){
-            printf("Nie udało się zamallocowac pustego liścia!\n");
+            (void) printf("Allocation of an empty leaf was unfortunately unsucesful!\n\n");
             exit(EXIT_FAILURE);
         }
-        *tmp = (leaf){0, 0, 0, '.'};
+        *tmp = (leaf){nullptr, nullptr, 0, '.'};
         return tmp;
     }
-    leaf min = holder -> tab[0];
+    leaf min = handle -> tab[0];
     tmp = malloc(sizeof(*tmp));
     if(!tmp){
-        printf("Nie udało się zamallocować liścia!\n");
+        (void) printf("Allocation of a new leaf was unfortunately unsucesful!\n\n");
         exit(EXIT_FAILURE);
     }
     *tmp = min;
-    holder -> tab[0] = holder -> tab[holder -> heap_size - 1];
-    holder -> heap_size -= 1;
-    min_heapify(holder, 0);
+    handle -> tab[0] = handle -> tab[handle -> heap_size - 1];
+    handle -> heap_size -= 1;
+    min_heapify(handle, 0);
     return tmp;
 }
 
-void heap_decrease_key(heap* holder, int i, leaf* key, leaf old, bool changed){
-    if(key -> counter > holder -> tab[i].counter){
-        printf("Nowy klucz jest większy niż klucz aktualny!\n\n");
+void heap_decrease_key(heap* handle, int32_t i, leaf* key, leaf old, bool changed){
+    if(key -> counter > handle -> tab[i].counter){
+        (void) printf("A new key is bigger than the current one!\n\n");
         if(!changed)
-            holder -> tab[holder -> heap_size - 1] = old;
+            handle -> tab[handle -> heap_size - 1] = old;
         else{
-            holder -> length -= 1;
-            holder -> heap_size -= 1;
-            holder -> tab = realloc(holder -> tab, (holder -> heap_size) * sizeof(leaf));
+            handle -> length -= 1;
+            handle -> heap_size -= 1;
+            handle -> tab = realloc(handle -> tab, (handle -> heap_size) * sizeof(*(handle -> tab)));
         }
         return;
     }
-    holder -> tab[i] = *key;
-    while(i > 0 && holder -> tab[parent(i)].counter > holder -> tab[i].counter){
-        swap(&(holder -> tab[i]), &(holder -> tab[parent(i)]));
+    handle -> tab[i] = *key;
+    while(i > 0 && handle -> tab[parent(i)].counter > handle -> tab[i].counter){
+        swap(&(handle -> tab[i]), &(handle -> tab[parent(i)]));
         i = parent(i);
     }
     return;
 }
 
-void min_heap_insert(heap* holder, leaf* key){
-    holder -> heap_size += 1;
+void min_heap_insert(heap* handle, leaf* key){
+    handle -> heap_size += 1;
     bool changed = false;
-    if(holder -> heap_size > holder -> length){
+    if(handle -> heap_size > handle -> length){
         changed = true;
-        holder -> tab = realloc(holder -> tab, (holder -> heap_size) * sizeof(leaf));
-        if(!(holder -> tab)){
-            printf("Nie udało się powiększyć kopca!\n");
+        handle -> tab = realloc(handle -> tab, (handle -> heap_size) * sizeof((handle -> tab)[0]));
+        if(!(handle -> tab)){
+            (void) printf("Error - extention of the heap was unfortunately unsuccesful!\n\n");
             exit(EXIT_FAILURE);
         }
-        holder -> length = holder -> heap_size;
+        handle -> length = handle -> heap_size;
     }
     leaf old;
     if(!changed)
-        old = holder -> tab[holder -> heap_size - 1];
+        old = handle -> tab[handle -> heap_size - 1];
     else{
-        old.left = old.right = 0;
+        old.left = old.right = nullptr;
         old.counter = 0;
         old.sign = '.';
     }
-    holder -> tab[holder -> heap_size - 1] = (leaf){0, 0, INT_MAX, '.'};
-    heap_decrease_key(holder, holder -> heap_size - 1, key, old, changed);
+    handle -> tab[handle -> heap_size - 1] = (leaf){nullptr, nullptr, INT32_MAX, '.'};
+    heap_decrease_key(handle, handle -> heap_size - 1, key, old, changed);
     return;
 }
 
-void print_heap(heap* holder){
-    printf("Length: %d\n", holder -> length);
-    printf("Heap_size: %d\n\n", holder -> heap_size);
-    printf("Whole table:\n");
-    for(int i = 0; i < holder -> length; ++i){
-        printf("\ntab[%d]:\n", i);
-        if(holder -> tab[i].sign != '\n')
-            printf("Litera: %c\n", holder -> tab[i].sign);
-        else
-            printf("Litera: \\n\n");
-        printf("Liczba wystąpień: %d\n", holder -> tab[i].counter);
+void print_heap(heap* handle){
+    (void) printf("Length: %" PRId32 "\n", handle -> length);
+    (void) printf("Heap_size: %" PRId32 "\n\n", handle -> heap_size);
+    (void) printf("Whole table:\n\n");
+    for(int32_t i = 0; i < handle -> length; ++i){
+        (void) printf("\ntab[%" PRId32 "]:\n", i);
+        if(handle -> tab[i].sign != '\n') (void) printf("Letter: %c\n", handle -> tab[i].sign);
+        else (void)printf("Letter: \\n\n");
+        (void) printf("Number of occurences: %" PRId32 "\n", handle -> tab[i].counter);
     }
-    printf("\nHeap only:\n");
-    for(int i = 0; i < holder -> heap_size; ++i){
-        printf("\ntab[%d]:\n", i);
-        if(holder -> tab[i].sign != '\n')
-            printf("Litera: %c\n", holder -> tab[i].sign);
-        else
-            printf("Litera: \\n\n");
-        printf("Liczba wystąpień: %d\n", holder -> tab[i].counter);
+    (void) printf("\nHeap only:\n");
+    for(int32_t i = 0; i < handle -> heap_size; ++i){
+        (void) printf("\ntab[%" PRId32"]:\n", i);
+        if(handle -> tab[i].sign != '\n') (void) printf("Letter: %c\n", handle -> tab[i].sign);
+        else (void) printf("Letter: \\n\n");
+        (void) printf("Number of occurences: %d\n", handle -> tab[i].counter);
     }
-    printf("\n");
+    (void) printf("\n");
     return;
 }
 
-void free_heap(heap** holder_adress){
-    printf("Zwalniam kopiec!\n\n");
-    free((*holder_adress) -> tab);
-    free(*holder_adress);
-    *holder_adress = 0;
+void free_heap(heap** handle_adress){
+    (void) printf("Deallocation of the heap!\n\n");
+    free((*handle_adress) -> tab);
+    free(*handle_adress);
+    *handle_adress = nullptr;
     return;
 }
 
-heap* create_heap(int n, leaf* tab){
-    heap* holder = malloc(sizeof(*holder));
-    if(!holder){
-        printf("Nie udało się zamallocować pamięci na informacje o kopcu!\n");
+heap* create_heap(int32_t n, leaf* tab){
+    heap* handle = malloc(sizeof(*handle));
+    if(!handle){
+        (void) printf("Allocation of handle for the heap was unfortunately unsucessful!\n\n");
         exit(EXIT_FAILURE);
     }
-    holder -> length = n;
-    holder -> heap_size = n;
-    holder -> tab = tab;
-    return holder;
+    handle -> length = n;
+    handle -> heap_size = n;
+    handle -> tab = tab;
+    return handle;
 }
 
-void treewalk(leaf* node, int depth, char* buffer, char* tabsign, char** tabcodes, int* ptridx){
+void tree_walk(leaf* node, int32_t depth, char* buffer, char* tabsign, char** tabcodes, int32_t* ptridx){
     if(!node) return;
     if(!(node -> left) && !(node -> right)){
         buffer[depth] = '\0';
@@ -169,16 +150,16 @@ void treewalk(leaf* node, int depth, char* buffer, char* tabsign, char** tabcode
     else{
         if(node -> left){
             buffer[depth] = '0';
-            treewalk(node -> left, depth + 1, buffer , tabsign, tabcodes, ptridx);
+            tree_walk(node -> left, depth + 1, buffer , tabsign, tabcodes, ptridx);
         }
         if(node -> right){
             buffer[depth] = '1';
-            treewalk(node -> right, depth + 1, buffer , tabsign, tabcodes, ptridx);
+            tree_walk(node -> right, depth + 1, buffer , tabsign, tabcodes, ptridx);
         }
     }
 }
 
-void write_bit(FILE* file, unsigned char bit, unsigned char* buf, int* bit_count){
+void write_bit(FILE* file, unsigned char bit, unsigned char* buf, int32_t* bit_count){
     *buf = (*buf << 1) | (bit & 1);
     (*bit_count)++;
     if(*bit_count == 8){
@@ -198,45 +179,39 @@ void free_tree(leaf* root){
 void decode(leaf* root, char* coded, char* decoded){
     FILE* fcoded = fopen(coded, "rb");
     if(!fcoded){
-        printf("Nie udało się otworzyć pliku binarnego do dekodowania!\n");
+        (void) printf("Error - it was not possible to open the binary file to decoding!\n\n");
         exit(EXIT_FAILURE);
     }
     FILE* fdecoded = fopen(decoded, "w");
     if(!fdecoded){
-        printf("Nie udało się otworzyć pliku tekstowego do dekodowania!\n");
-        fclose(fcoded);
+        (void) printf("Error - it was not possible to open the txt file to decoding!\n\n");
         exit(EXIT_FAILURE);
-        return;
     }
-    int input_length = 0;
-    fread(&input_length, sizeof(int), 1, fcoded);
-    int decoded_count = 0;
+    int32_t input_length = 0;
+    fread(&input_length, sizeof(int32_t), 1, fcoded);
+    int32_t decoded_count = 0;
     leaf* current = root;
-    int byte;
+    int32_t byte, bit;
     while(decoded_count < input_length && (byte = getc(fcoded)) != EOF){
-        for(int bit_pos = 7; bit_pos >= 0; bit_pos--){
-            int bit = (byte >> bit_pos) & 1;
-            if(!bit)
-                current = current->left;
-            else
-                current = current->right;
-
+        for(int32_t bit_pos = 7; bit_pos >= 0; --bit_pos){
+            bit = (byte >> bit_pos) & 1;
+            if(!bit) current = current -> left;
+            else current = current -> right;
             if(!current){
-                printf("Błąd dekodowania\n");
+                (void) printf("Unexpected error of decoding occured!\n\n");
                 fclose(fcoded);
                 fclose(fdecoded);
                 return;
             }
-
             if(!(current -> left) && !(current -> right)){
                 fputc(current -> sign, fdecoded);
                 current = root;
                 decoded_count++;
-                if(decoded_count == input_length)
-                    break;
+                if(decoded_count == input_length) break;
             }
         }
     }
     fclose(fcoded);
     fclose(fdecoded);
+    return;
 }

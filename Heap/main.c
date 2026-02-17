@@ -2,45 +2,58 @@
 
 jmp_buf env;
 
-void handler(void){
+void catcher(void){
     longjmp(env, 1);
 }
 
 int main(void){
     srand(time(0));
-    int n;
+
+    int32_t n;
+
+    // I am aware of the fact that longjump is a serious overkill here.
+    // However I was curious and wanted to see how it works.
+
     if(setjmp(env))
-        printf("Rozmiar powinien być > 0!\n");
+        (void) printf("Size of the heap should be > 0!\n\n");
     do{
-        printf("Podaj rozmiar kopca, który chcesz stworzyć (> 0): ");
-        scanf("%d", &n);
+        (void) printf("Please input size of the heap which you would like to create(> 0): ");
+        scanf("%" SCNd32, &n);
         if(n <= 0)
-            handler();
+            catcher();
     } while(n <= 0);
-    heap* holder = create_heap(n);
-    printf("\n\nZaraz po wylosowaniu:\n\n");
-    print_heap(holder);
-    build_min_heap(holder);
-    printf("Zbudowany kopiec:\n\n");
-    print_heap(holder);
-    int min = heap_extract_min(holder);
-    printf("Min = %d\n\nPo usunięciu min:\n\n", min);
-    print_heap(holder);
-    heap_decrease_key(holder, holder -> heap_size - 1, min, holder -> tab[holder -> heap_size - 1], false);
-    printf("Po zmniejszeniu klucza ostatniego elementu kopca:\n\n");
-    print_heap(holder);
-    min_heap_insert(holder, 0);
-    min_heap_insert(holder, -1);
-    printf("Po wstawieniu dwóch elementów o kluczach mniejszych:\n\n");
-    print_heap(holder);
-    heapsort(holder);
-    printf("Po posortowaniu heapsortem:\n\n");
-    print_heap(holder);
-    odwr(holder);
-    printf("Po obróceniu tabeli:\n\n");
-    print_heap(holder);
-    free_heap(&holder);
-    return 0;
+
+    heap* handle = create_heap(n);
+    (void) printf("\n\nRandomly created heap:\n\n");
+    print_heap(handle);
+
+    build_min_heap(handle);
+    (void) printf("Properly built heap:\n\n");
+    print_heap(handle);
+
+    int32_t min = heap_extract_min(handle);
+    (void) printf("Minimal value of the heap = %" PRId32 "\n\nHeap after extraction of minimal value\n\n", min);
+    print_heap(handle);
+
+    heap_decrease_key(handle, handle -> heap_size - 1, min, handle -> tab[handle -> heap_size - 1], false);
+    (void) printf("After decreasing key of the last element of the heap:\n\n");
+    print_heap(handle);
+
+    min_heap_insert(handle, 0);
+    min_heap_insert(handle, -1);
+    (void) printf("After inserting to elements with lower value of their keys:\n\n");
+    print_heap(handle);
+
+    heapsort(handle);
+    (void) printf("Heap after it was sorted with heapsort algorithm:\n\n");
+    print_heap(handle);
+
+    reverse(handle);
+    (void) printf("Reversed heap:\n\n");
+    print_heap(handle);
+
+    free_heap(&handle);
+    return EXIT_SUCCESS;
 }
 
 

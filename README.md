@@ -1,20 +1,20 @@
-# C Data Structures & Tricks 🎯
+# C Data Structures & Tricks 
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **Clean, efficient C implementations** from **CLRS (Cormen)**:
 
-## 📺 **Must-Watch: Charles Cabergs "Advanced C"**  
-YouTube series — [Charles Cabergs Advanced C](https://www.youtube.com/watch?v=g7CCaRwRVBQ&list=PL71Y0EmrppR0KyZvQWj63040UEzKQU7n8)
-
-## 📚 **Recommended Books** (read **originals** in English!)
+## **Recommended Books** (read **originals** in English!)
 - *Introduction to Algorithms* by Cormen et al. (CLRS) — **data structures source**  
 - *Modern C* by Jens Gustedt  
 - *Expert C Programming* by Peter van der Linden  
 
-> **These are MUST-READS for serious C programmers.**
+## **Other Recommendations**  
+[Jens Gustedt's Blog – programming in modern C](https://gustedt.wordpress.com/)
+YouTube series — [Charles Cabergs Advanced C](https://www.youtube.com/watch?v=g7CCaRwRVBQ&list=PL71Y0EmrppR0KyZvQWj63040UEzKQU7n8)
+[Daniel Hirsch - YouTube](https://www.youtube.com/@HirschDaniel)
 
-## 📋 Implemented Data Structures (from CLRS)
+## Implemented Data Structures (from CLRS)
 | Module | Complexity | Description |
 |--------|------------|-------------|
 | [Binary Tree](./Binary_tree) | O(log n) | Balanced tree operations |
@@ -34,14 +34,14 @@ cd Binary_tree/build && ./Binary_tree
 make -C Binary_tree  
 cd Binary_tree/build && ./Binary_tree  
 
-## ⚠️ **Binary Location Note**
+## **Binary Location Note**
 - **Most modules**: Binary in `Module/build/` (run from `build/`)
 - **Huffman Coding** works differently: Binary in `Huffman_coding/` (next to `main.c`)
 
 **Huffman example:**  
 cmake -S Huffman_coding -B Huffman_coding/build  
 cmake --build Huffman_coding/build  
-cd Huffman_coding && ./Huffman_coding  
+cd Huffman_coding && ./Huffman_coding input.txt  
 
 ## C_tricks
 15 examples from above books.

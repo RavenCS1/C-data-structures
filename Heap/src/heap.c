@@ -1,161 +1,140 @@
 #include "heap.h"
 
-int parent(int i){
-    return (i - 1) / 2;
-}
-
-int left(int i){
-    return 2 * i + 1;
-}
-
-int right(int i){
-    return 2 * i + 2;
-}
-
-void swap(int* a, int* b){
-    int tmp = *a;
+void swap(int32_t* a, int32_t* b){
+    int32_t tmp = *a;
     *a = *b;
     *b = tmp;
     return;
 }
 
-void min_heapify(heap* holder, int i){
-    int l = left(i);
-    int r = right(i);
-    int smallest;
-    if((l < holder -> heap_size) && (holder -> tab[l] < holder -> tab[i]))
-        smallest = l;
-    else
-        smallest = i;
-    if((r < holder -> heap_size) && (holder -> tab[r] < holder -> tab[smallest]))
-        smallest = r;
+void min_heapify(heap* handle, int32_t i){
+    int32_t l = left(i);
+    int32_t r = right(i);
+    int32_t smallest;
+    if((l < handle -> heap_size) && (handle -> tab[l] < handle -> tab[i])) smallest = l;
+    else smallest = i;
+    if((r < handle -> heap_size) && (handle -> tab[r] < handle -> tab[smallest])) smallest = r;
     if(smallest != i){
-       swap(&(holder -> tab[i]), &(holder -> tab[smallest]));
-       min_heapify(holder, smallest);
+       swap(&(handle -> tab[i]), &(handle -> tab[smallest]));
+       min_heapify(handle, smallest);
     }
     return;
 }
 
-void build_min_heap(heap* holder){
-    holder -> heap_size = holder -> length;
-    for(int i = holder -> length / 2 - 1; i >= 0; --i)
-        min_heapify(holder, i);
+void build_min_heap(heap* handle){
+    handle -> heap_size = handle -> length;
+    for(int32_t i = handle -> length / 2 - 1; i >= 0; --i)
+        min_heapify(handle, i);
     return;
 }
 
-void heapsort(heap* holder){
-    build_min_heap(holder);
-    for(int i = (holder -> length) - 1; i >= 1; --i){
-        swap(&(holder -> tab[0]), &(holder -> tab[i]));
-        holder -> heap_size -= 1;
-        min_heapify(holder, 0);
+void heapsort(heap* handle){
+    build_min_heap(handle);
+    for(int32_t i = (handle -> length) - 1; i >= 1; --i){
+        swap(&(handle -> tab[0]), &(handle -> tab[i]));
+        handle -> heap_size -= 1;
+        min_heapify(handle, 0);
     }
-    holder -> heap_size = holder -> length;
+    handle -> heap_size = handle -> length;
     return; 
 }
-void odwr(heap* holder){
-    for (int i = 0; i < holder -> length / 2; ++i)
-        swap(&(holder -> tab[i]), &(holder -> tab[holder -> length - 1 - i]));
+void reverse(heap* handle){
+    for(int32_t i = 0; i < handle -> length / 2; ++i)
+        swap(&(handle -> tab[i]), &(handle-> tab[handle -> length - 1 - i]));
 }
 
-int heap_minimum(heap* holder){
-    return holder -> tab[0];
+int32_t heap_minimum(heap* handle){
+    return handle -> tab[0];
 }
 
-int heap_extract_min(heap* holder){
-    if(holder -> heap_size < 1){
-        printf("Błąd - kopiec jest pusty!\n");
+int32_t heap_extract_min(heap* handle){
+    if(handle -> heap_size < 1){
+        (void) printf("Error - heap is currently empty!\n\n");
         return -1;
     }
-    int min = holder -> tab[0];
-    holder -> tab[0] = holder -> tab[holder -> heap_size - 1];
-    holder -> heap_size -= 1;
-    min_heapify(holder, 0);
+    int32_t min = handle -> tab[0];
+    handle -> tab[0] = handle -> tab[handle -> heap_size - 1];
+    handle -> heap_size -= 1;
+    min_heapify(handle, 0);
     return min;
 }
 
-void heap_decrease_key(heap* holder, int i, int key, int old, bool changed){
-    if(key > holder -> tab[i]){
-        printf("Nowy klucz jest większy niż klucz aktualny!\n\n");
+void heap_decrease_key(heap* handle, int32_t i, int32_t key, int32_t old, bool changed){
+    if(key > handle -> tab[i]){
+        (void) printf("A new key is bigger than the current key!\n\n");
         if(!changed)
-            holder -> tab[holder -> heap_size - 1] = old;
+            handle -> tab[handle -> heap_size - 1] = old;
         else{
-            holder -> length -= 1;
-            holder -> heap_size -= 1;
-            holder -> tab = realloc(holder -> tab, (holder -> heap_size) * sizeof(int));
+            handle -> length -= 1;
+            handle -> heap_size -= 1;
+            handle -> tab = realloc(handle -> tab, (handle -> heap_size) * sizeof((handle -> tab)[0]));
         }
         return;
     }
-    holder -> tab[i] = key;
-    while(i > 0 && holder -> tab[parent(i)] > holder -> tab[i]){
-        swap(&(holder -> tab[i]), &(holder -> tab[parent(i)]));
+    handle -> tab[i] = key;
+    while(i > 0 && handle -> tab[parent(i)] > handle -> tab[i]){
+        swap(&(handle -> tab[i]), &(handle -> tab[parent(i)]));
         i = parent(i);
     }
     return;
 }
 
-void min_heap_insert(heap* holder, int key){
-    holder -> heap_size += 1;
+void min_heap_insert(heap* handle, int32_t key){
+    handle -> heap_size += 1;
     bool changed = false;
-    if(holder -> heap_size > holder -> length){
+    if(handle -> heap_size > handle -> length){
         changed = true;
-        holder -> tab = realloc(holder -> tab, (holder -> heap_size) * sizeof(int));
-        if(!(holder -> tab)){
-            printf("Nie udało się powiększyć kopca!\n");
+        handle -> tab = realloc(handle -> tab, (handle -> heap_size) * sizeof((handle -> tab)[0]));
+        if(!(handle -> tab)){
+            (void) printf("Error - extention of the heap was unfortunately unsuccesful!\n");
             exit(EXIT_FAILURE);
         }
-        holder -> length = holder -> heap_size;
+        handle -> length = handle -> heap_size;
     }
-    int old;
-    if(!changed)
-        old = holder -> tab[holder -> heap_size - 1];
-    else
-        old = -1;
-    holder -> tab[holder -> heap_size - 1] = INT_MAX; 
-    heap_decrease_key(holder, holder -> heap_size - 1, key, old, changed);
+    int32_t old;
+    if(!changed) old = handle -> tab[handle -> heap_size - 1];
+    else old = -1;
+    handle -> tab[handle -> heap_size - 1] = INT32_MAX; 
+    heap_decrease_key(handle, handle -> heap_size - 1, key, old, changed);
     return;
 }
 
-void print_heap(heap* holder){
-    printf("Length: %d\n", holder -> length);
-    printf("Heap_size: %d\n\n", holder -> heap_size);
-    printf("Whole table:\n");
-    for(int i = 0; i < holder -> length; ++i)
-        printf("tab[%d] = %d\n", i, holder -> tab[i]);
-    printf("\nHeap only:\n");
-    for(int i = 0; i < holder -> heap_size; ++i)
-        printf("tab[%d] = %d\n", i, holder -> tab[i]);
-    printf("\n");
+void print_heap(heap* handle){
+    (void) printf("Current status of the heap:\n\n");
+    (void) printf("Length: %" PRId32 "\n", handle -> length);
+    (void) printf("Heap_size: %" PRId32 "\n\n", handle -> heap_size);
+    (void) printf("Whole table:\n");
+    for(int32_t i = 0; i < handle -> length; ++i)
+        (void) printf("tab[%" PRId32 "] = %" PRId32 "\n", i, handle -> tab[i]);
+    (void) printf("\nHeap only:\n");
+    for(int32_t i = 0; i < handle -> heap_size; ++i)
+        (void) printf("tab[%" PRId32 "] = %" PRId32 "\n", i, handle -> tab[i]);
+    (void) printf("\n");
     return;
 }
 
-void free_heap(heap** holder_adress){
-    printf("Zwalniam kopiec!\n");
-    free((*holder_adress) -> tab);
-    free(*holder_adress);
-    *holder_adress = 0;
+void free_heap(heap** handle_address){
+    (void) printf("Deallocation of the heap!\n\n");
+    free((*handle_address) -> tab);
+    free(*handle_address);
     return;
 }
 
-int rand_i(int a, int b){
-    return (a + rand() % (b - a + 1));
-}
-
-heap* create_heap(int n){
-    heap* holder = malloc(sizeof(heap));
-    if(!holder){
-        printf("Nie udało się zamallocować pamięci na informacje o kopcu!\n");
+heap* create_heap(int32_t n){
+    heap* handle = malloc(sizeof(*handle));
+    if(!handle){
+        (void) printf("Allocation of the heap handle was unfortunately unsuccesful!\n\n");
         exit(EXIT_FAILURE);
     }
-    holder -> length = n;
-    holder -> heap_size = n;
-    holder -> tab = malloc(n * sizeof(int));
-    if(!(holder -> tab)){
-        printf("Nie udało się zamallocować kopca!\n");
+    handle -> length = n;
+    handle -> heap_size = n;
+    handle -> tab = malloc(sizeof(int32_t[n]));
+    if(!(handle -> tab)){
+        (void) printf("Allocation of the heap was unfortunately unsuccesful!\n\n");
         exit(EXIT_FAILURE);
     }
-    for(int i = 0; i < n; ++i)
-        holder -> tab[i] = rand_i(1, n);
-    return holder;
+    for(int32_t i = 0; i < n; ++i)
+        handle -> tab[i] = rand_int32_t(1, n);
+    return handle;
 }
 

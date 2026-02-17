@@ -2,71 +2,64 @@
 
 int main(void){
     srand(time(0));
-    node* root = 0;
-    node* new = 0;
-    for(int i = 0; i < N; ++i){
-        new = create(rand_i(1, 20));
+
+    node* root = nullptr;
+    node* new = nullptr;
+
+    for(int32_t i = 0; i < N; ++i){
+        new = create(rand_int32_t(1, 20));
         tree_insert(&root, new);
     }
-    printf("Inorder_tree_walk:\n\n");
+
+    (void) printf("Inorder_tree_walk:\n\n");
     inorder_tree_walk(root);
-    printf("Preorder_tree_walk:\n\n");
+
+    (void) printf("Preorder_tree_walk:\n\n");
     preorder_tree_walk(root);
-    printf("Postorder_tree_walk:\n\n");
+
+    (void) printf("Postorder_tree_walk:\n\n");
     postorder_tree_walk(root);
-    node* found1 = tree_search(root, rand_i(1, 20));
+
+    node* found1 = tree_search(root, rand_int32_t(1, 20));
     if(found1){
-        printf("Tree_search found %p:\n", found1);
-        printf("Wartość klucza: %d\n", found1 -> key);
-        printf("Adres rodzica: %p\n", found1 -> parent);
-        printf("Adres lewego syna: %p\n", found1 -> left);
-        printf("Adres prawego syna: %p\n\n", found1 -> right);
+        (void) printf("Tree_search found:\n");
+        print_leaf(found1);
     }
-    node* found2 = iterative_tree_search(root, rand_i(1, 20));
+
+    node* found2 = iterative_tree_search(root, rand_int32_t(1, 20));
     if(found2){
-        printf("Iterative_tree_search found %p:\n", found2);
-        printf("Wartość klucza: %d\n", found2 -> key);
-        printf("Adres rodzica: %p\n", found2 -> parent);
-        printf("Adres lewego syna: %p\n", found2 -> left);
-        printf("Adres prawego syna: %p\n\n", found2 -> right);
+        (void) printf("Iterative_tree_search found:\n");
+        print_leaf(found2);
     }
+
     node* min = tree_minimum(root);
-    printf("Minimum drzewa %p:\n", min);
-    printf("Wartość klucza: %d\n", min -> key);
-    printf("Adres rodzica: %p\n", min -> parent);
-    printf("Adres lewego syna: %p\n", min -> left);
-    printf("Adres prawego syna: %p\n\n", min -> right);
+    (void) printf("Minimal value of the tree:\n");
+    print_leaf(min);
+
     node* max = tree_maximum(root);
-    printf("Maximum drzewa %p:\n", max);
-    printf("Wartość klucza: %d\n", max -> key);
-    printf("Adres rodzica: %p\n", max -> parent);
-    printf("Adres lewego syna: %p\n", max -> left);
-    printf("Adres prawego syna: %p\n\n", max -> right);
+    (void) printf("Maximal value of the tree:\n");
+    print_leaf(max);
+
     node* suc = tree_successor(min);
-    printf("Następnik minimum drzewa %p:\n", suc);
-    printf("Wartość klucza: %d\n", suc -> key);
-    printf("Adres rodzica: %p\n", suc -> parent);
-    printf("Adres lewego syna: %p\n", suc -> left);
-    printf("Adres prawego syna: %p\n\n", suc -> right);
+    (void) printf("Successor of the node with minimal value of the tree:\n");
+    print_leaf(suc);
+
     node* pre = tree_predecessor(max);
-    printf("Poprzednik maximum drzewa %p:\n", pre);
-    printf("Wartość klucza: %d\n", pre -> key);
-    printf("Adres rodzica: %p\n", pre -> parent);
-    printf("Adres lewego syna: %p\n", pre -> left);
-    printf("Adres prawego syna: %p\n\n", pre -> right);
-    for(int i = 0; i < N / 2; ++i){
-        node* todelete = iterative_tree_search(root, rand_i(1,20));
+    (void) printf("Predecessor of the node with maximal value of the tree:\n");
+    print_leaf(pre);
+
+    for(int32_t i = 0; i < N / 2; ++i){
+        node* todelete = iterative_tree_search(root, rand_int32_t(1,20));
         if(todelete){
-            printf("Usuwam następujący element: %p\n", todelete);
-            printf("Wartość klucza: %d\n", todelete -> key);
-            printf("Adres rodzica: %p\n", todelete -> parent);
-            printf("Adres lewego syna: %p\n", todelete -> left);
-            printf("Adres prawego syna: %p\n\n", todelete -> right);
+            (void) printf("Dealocation of a node:\n");
+            print_leaf(todelete);
             tree_delete(&root, todelete);
         }
     }
-    printf("Inorder_tree_walk:\n\n");
+    (void) printf("Inorder_tree_walk:\n\n");
     inorder_tree_walk(root);
+
     free_tree(&root);
+    
     return EXIT_SUCCESS;
 }

@@ -5,36 +5,48 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stdint.h>
+#include <inttypes.h>
+#include <stddef.h>
 #include <ctype.h>
 #include <limits.h>
 
 typedef struct leaf{
     struct leaf* left;
     struct leaf* right;
-    int counter;
+    int32_t counter;
     char sign;
 } leaf;
 
 typedef struct heap{
-    int length;
-    int heap_size;
+    int32_t length;
+    int32_t heap_size;
     leaf* tab;
 } heap;
 
-int parent(int);
-int left(int);
-int right(int);
+static inline int32_t parent(int32_t i){
+    return (i - 1) / 2;
+}
+
+static inline int32_t left(int32_t i){
+    return 2 * i + 1;
+}
+
+static inline int32_t right(int32_t i){
+    return 2 * i + 2;
+}
+
 void swap(leaf*, leaf*);
-void min_heapify(heap*, int);
+void min_heapify(heap*, int32_t);
 void build_min_heap(heap*);
 leaf* heap_extract_min(heap*);
-void heap_decrease_key(heap*, int, leaf*, leaf, bool);
+void heap_decrease_key(heap*, int32_t, leaf*, leaf, bool);
 void min_heap_insert(heap*, leaf*);
 void print_heap(heap*);
 void free_heap(heap**);
-heap* create_heap(int, leaf*);
-void treewalk(leaf*, int , char* , char* , char** , int*);
-void write_bit(FILE* file, unsigned char bit, unsigned char* buf, int* bit_count);
+heap* create_heap(int32_t, leaf*);
+void tree_walk(leaf*, int32_t , char* , char* , char** , int32_t*);
+void write_bit(FILE* file, unsigned char bit, unsigned char* buf, int32_t* bit_count);
 void free_tree(leaf* node);
 void decode(leaf* root, char* coded, char* decoded);
 

@@ -12,8 +12,8 @@ make build-clean
 **Binary created in current directory** (same level as `main.c`)
 
 ## Usage
-Put input.txt in this directory  
-./Huffman_coding
+Put a file which you would like to encrypt in this directory and use command line argument in this manner:
+./Huffman_coding input.txt
 
 Generated files (same directory):
 - output.bin (encoded binary)
@@ -28,4 +28,3 @@ echo "Hello World" > input.txt
 diff input.txt output.txt (should be empty - perfect match)  
 ls -la output.bin # Compressed binary
 
-**No command line arguments needed!**

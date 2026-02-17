@@ -1,23 +1,23 @@
 #include "brtree.h"
 
-leaf* allocate_leaf(int key){
+leaf* allocate_leaf(int32_t key){
     leaf* new_leaf = malloc(sizeof(*new_leaf));
     if(!new_leaf){
-        printf("Nie udało się utworzyć liścia!\n");
+        (void) printf("Allocation of a new leaf was unfortunately unsucessful!\n\n");
         exit(EXIT_FAILURE);
     }
     new_leaf -> value = key;
-    new_leaf -> parent = new_leaf -> left = new_leaf -> right = 0;
+    new_leaf -> parent = new_leaf -> left = new_leaf -> right = nullptr;
     return new_leaf;
 }
 
 holder* allocate_holder(void){
     holder* tree = malloc(sizeof(*tree));
     if(!tree){
-        printf("Nie udało się utworzyć holder!\n");
+        (void) printf("Allocation of a handle for the tree was unfortunately unsucessful!\n\n");
         exit(EXIT_FAILURE);
     }
-    tree -> root = 0;
+    tree -> root = nullptr;
     leaf* sentinel = allocate_leaf(-1);
     tree -> guard = sentinel;
     tree -> guard -> color = BLACK;
@@ -35,10 +35,10 @@ void free_tree(holder* tree, leaf* x){
     return;
 }
 
-void free_holder(holder** ptrholder){
-    free((*ptrholder) -> guard);
-    free(*ptrholder);
-    *ptrholder = 0;
+void free_holder(holder** handle_address){
+    free((*handle_address) -> guard);
+    free(*handle_address);
+    *handle_address = nullptr;
     return;
 }
 
@@ -58,12 +58,7 @@ void inorder_tree_walk(holder* tree, leaf* x){
 
 void preorder_tree_walk(holder* tree, leaf* x){
     if(x != tree -> guard){
-        printf("Wartość w węźle: %d\n", x -> value);
-        printf("Kolor węzła (0 - BLACK, 1 - RED): %d\n", x -> color);
-        printf("Adres węzła: %p\n", (void *)(x));
-        printf("Adres rodzica węzła: %p\n", (void *)(x -> parent));
-        printf("Adres lewego syna węzła:%p\n", (void *)(x -> left));
-        printf("Adres prawego syna węzła: %p\n\n", (void *)(x -> right));
+        print_leaf(tree, x);
         preorder_tree_walk(tree, x -> left);
         preorder_tree_walk(tree, x -> right);
     }
@@ -74,50 +69,40 @@ void postorder_tree_walk(holder* tree, leaf* x){
     if(x != tree -> guard){
         postorder_tree_walk(tree, x -> left);
         postorder_tree_walk(tree, x -> right);
-        printf("Wartość w węźle: %d\n", x -> value);
-        printf("Kolor węzła (0 - BLACK, 1 - RED): %d\n", x -> color);
-        printf("Adres węzła: %p\n", (void *)(x));
-        printf("Adres rodzica węzła: %p\n", (void *)(x -> parent));
-        printf("Adres lewego syna węzła:%p\n", (void *)(x -> left));
-        printf("Adres prawego syna węzła: %p\n\n", (void *)(x -> right));
+        print_leaf(tree, x);
     }
     return;
 }
 
 void print_leaf(holder* tree, leaf* x){
     if(x != tree -> guard){
-        printf("Wartość w węźle: %d\n", x -> value);
-        printf("Kolor węzła (0 - BLACK, 1 - RED): %d\n", x -> color);
-        printf("Adres węzła: %p\n", (void *)(x));
-        printf("Adres rodzica węzła: %p\n", (void *)(x -> parent));
-        printf("Adres lewego syna węzła:%p\n", (void *)(x -> left));
-        printf("Adres prawego syna węzła: %p\n\n", (void *)(x -> right));
+        (void) printf("Adress of the leaf: %p\n", (void *)(x));
+        (void) printf("Adress of the parent of the leaf: %p\n", (void *)(x -> parent));
+        (void) printf("Adress of the left son of the leaf: %p\n", (void *)(x -> left));
+        (void) printf("Adress of the right son of the leaf: %p\n\n", (void *)(x -> right));
+        (void) printf("Value of the key in the leaf: %" PRId32 "\n", x -> value);
+        (void) printf("Color of the leaf (0 - black, 1 - red): %" PRId8 "\n", x -> color);
     }
     return;
 }
 
 void prit_holder(holder* tree){
-    printf("Adres korzenia drzewa: %p\n", (void *)(tree -> root));
-    printf("Adres strażnika drzewa: %p\n", (void *)(tree -> guard));
-    printf("Liczba węzłów w drzewie: %d\n\n", tree -> numberofel);
+    (void) printf("Adress of the root of the Red-black tree: %p\n", (void *)(tree -> root));
+    (void) printf("Adress of the sentinel of the three: %p\n", (void *)(tree -> guard));
+    (void) printf("Number of leaves in the Red-black tree: %" PRId32 "\n\n", tree -> number_of_elem);
     return;
 }
 
-leaf* tree_search(holder* tree, leaf* x, int k){
-    if(x != tree -> guard || k == x -> value)
-        return x;
-    if(k < x -> value)
-        return tree_search(tree, x -> left, k);
-    else
-        return tree_search(tree, x -> right, k);
+leaf* tree_search(holder* tree, leaf* x, int32_t k){
+    if(x != tree -> guard || k == x -> value) return x;
+    if(k < x -> value) return tree_search(tree, x -> left, k);
+    else return tree_search(tree, x -> right, k);
 }
 
-leaf* iterative_tree_search(holder* tree, leaf* x, int k){
+leaf* iterative_tree_search(holder* tree, leaf* x, int32_t k){
     while(x != tree -> guard && k != x -> value){
-        if(k < x -> value)
-            x = x -> left;
-        else
-            x = x -> right;
+        if(k < x -> value) x = x -> left;
+        else x = x -> right;
    }
    return x;
 }
@@ -135,8 +120,7 @@ leaf* tree_maximum(holder* tree, leaf* x){
 }
 
 leaf* tree_successor(holder* tree, leaf* x){
-    if(x -> right != tree -> guard)
-        return tree_minimum(tree, x -> right);
+    if(x -> right != tree -> guard) return tree_minimum(tree, x -> right);
     leaf* y = x -> parent;
     while(y != tree -> guard && x == y -> right){
         x = y;
@@ -146,8 +130,7 @@ leaf* tree_successor(holder* tree, leaf* x){
 }
 
 leaf* tree_predecessor(holder* tree, leaf* x){
-    if(x -> left != tree -> guard)
-        return tree_maximum(tree, x -> left);
+    if(x -> left != tree -> guard) return tree_maximum(tree, x -> left);
     leaf*  y = x -> parent;
     while(y != tree -> guard && x == y -> left){
         x = y;
@@ -159,15 +142,11 @@ leaf* tree_predecessor(holder* tree, leaf* x){
 void right_rotate(holder* tree, leaf* x){
     leaf* y = x -> left;
     x -> left = y -> right;
-    if(y -> right != tree -> guard)
-        y -> right -> parent = x;
+    if(y -> right != tree -> guard) y -> right -> parent = x;
     y -> parent = x -> parent;
-    if(x -> parent == tree -> guard)
-        tree -> root = y;
-    else if(x == x -> parent -> right)
-        x -> parent -> right = y;
-    else
-        x -> parent -> left = y;
+    if(x -> parent == tree -> guard) tree -> root = y;
+    else if(x == x -> parent -> right) x -> parent -> right = y;
+    else x -> parent -> left = y;
     y -> right = x;
     x -> parent = y;
     return;
@@ -176,15 +155,11 @@ void right_rotate(holder* tree, leaf* x){
 void left_rotate(holder* tree, leaf* x){
     leaf* y = x -> right;
     x -> right = y -> left;
-    if(y -> left != tree -> guard)
-        y -> left -> parent = x;
+    if(y -> left != tree -> guard) y -> left -> parent = x;
     y -> parent = x -> parent;
-    if(x -> parent == tree -> guard)
-        tree -> root = y;
-    else if(x == x -> parent -> left)
-        x -> parent -> left = y;
-    else
-        x -> parent -> right = y;
+    if(x -> parent == tree -> guard) tree -> root = y;
+    else if(x == x -> parent -> left) x -> parent -> left = y;
+    else x -> parent -> right = y;
     y -> left = x;
     x -> parent = y;
     return;
@@ -195,28 +170,23 @@ void rb_insert(holder* tree, leaf* z){
     leaf* x = tree -> root;
     while(x != tree -> guard){
         y = x;
-        if(z -> value < x -> value)
-            x = x -> left;
-        else
-            x = x -> right;
+        if(z -> value < x -> value) x = x -> left;
+        else x = x -> right;
     }
     z -> parent = y;
-    if(y == tree -> guard)
-        tree -> root = z;
-    else if(z -> value < y -> value)
-        y -> left = z;
-    else
-        y -> right = z;
+    if(y == tree -> guard) tree -> root = z;
+    else if(z -> value < y -> value) y -> left = z;
+    else y -> right = z;
     z -> left = tree -> guard;
     z -> right = tree -> guard;
     z -> color = RED;
     rb_insert_fixup(tree, z);
-    tree -> numberofel += 1;
+    tree -> number_of_elem += 1;
     return;
 }
 
 void rb_insert_fixup(holder* tree,  leaf* z){
-    leaf* y = 0;
+    leaf* y = nullptr;
     while(z -> parent -> color == RED){
         if(z -> parent == z -> parent -> parent -> left){
             y = z -> parent -> parent -> right;
@@ -260,20 +230,17 @@ void rb_insert_fixup(holder* tree,  leaf* z){
 }
 
 void rb_transplant(holder* tree, leaf* u, leaf* v){
-    if(u -> parent == tree -> guard)
-        tree -> root = v;
-    else if(u == u -> parent -> left)
-        u -> parent -> left = v;
-    else
-        u -> parent -> right = v;
+    if(u -> parent == tree -> guard) tree -> root = v;
+    else if(u == u -> parent -> left) u -> parent -> left = v;
+    else u -> parent -> right = v;
     v -> parent = u -> parent;
     return;
 }
 
 void rb_delete(holder* tree, leaf* z){
     leaf* y = z;
-    leaf* x = 0;
-    int original_color = y -> color;
+    leaf* x = nullptr;
+    int32_t original_color = y -> color;
     if(z -> left == tree -> guard){
         x = z -> right;
         rb_transplant(tree, z, z -> right);
@@ -286,8 +253,7 @@ void rb_delete(holder* tree, leaf* z){
         y = tree_minimum(tree, z -> right);
         original_color = y -> color;
         x = y -> right;
-        if(y -> parent == z)
-            x -> parent = y;
+        if(y -> parent == z) x -> parent = y;
         else{
             rb_transplant(tree, y, y -> right);
             y -> right = z -> right;
@@ -299,14 +265,13 @@ void rb_delete(holder* tree, leaf* z){
         y -> color = z -> color;
     }
     free(z);
-    if(original_color == BLACK)
-        rb_delete_fixup(tree, x);
-    tree -> numberofel -= 1;
+    if(original_color == BLACK) rb_delete_fixup(tree, x);
+    tree -> number_of_elem -= 1;
     return;
 }
 
 void rb_delete_fixup(holder* tree, leaf* x){
-    leaf* w = 0;
+    leaf* w = nullptr;
     while(x != tree -> guard && x -> color == BLACK){
         if(x == x -> parent -> left){
             w = x -> parent -> right;

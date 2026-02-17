@@ -2,7 +2,7 @@
 
 **Modern C** (Jens Gustedt) + **Expert C Programming** (Peter van der Linden) - direct examples + insights.
 
-## 📋 Examples Overview
+## Examples Overview
 | # | Topic | Status | Key Lesson |
 |---|-------|--------|------------|
 | 01 | [Assembly Inline](./01_assembly_inline.c) | ✅ Works | Uses inline assembly parts |
@@ -21,7 +21,7 @@
 | 14 | [String Adjacency](./14_string_literal_adjacency.c) | ✅ Works | String literal adjacency + trailing comma |
 | 15 | [Typedef vs Macro](./15_typedef_vs_macro.c) | ❌ Won't compile | `typedef` ≠ textual replacement |
 
-## 🚀 Makefile Usage
+## Makefile Usage
 
 make all # Compile all 15 (exactly 3 fail: 04,13,15)  
 make run # Run 12 working examples  
@@ -29,11 +29,11 @@ make clean # Remove binaries
 make status # Update this table!  
 make rebuild # clean + all  
 
-## 📁 Quick Demo
+## Quick Demo
 cd C_tricks/  
 make run # One command = 12/15 demos work!  
 
-## 📚 Book Attribution
+## Book Attribution
 Examples adapted from:
 
 Modern C (Jens Gustedt) - C11/C17 standards
@@ -42,7 +42,7 @@ Expert C Programming (Peter van der Linden) - classic pitfalls
 
 For educational use only. Buy original books for full context!
 
-## ⚖️ Fair Use Notice
+## Fair Use Notice
 Short educational examples (<50 lines) from C literature discussions.
 
-**Pro tip:** `gcc -E` for macros, `gcc -S` for assembly output!
+**Pro tip:** use `gcc -E` for macros and `gcc -S` for assembly output!

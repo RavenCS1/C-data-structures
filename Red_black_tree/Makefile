@@ -6,7 +6,7 @@ CC=gcc
 OPT=-O3
 
 DEPFLAGS=-MP -MD
-CFLAGS=-Wall -Wextra -g -std=c11 $(foreach D, $(INCDIRS), -I$(D)) $(OPT) $(DEPFLAGS)
+CFLAGS=-Wall -Wextra -g -std=c2x $(foreach D, $(INCDIRS), -I$(D)) $(OPT) $(DEPFLAGS)
 
 CFILES=$(foreach D, $(CODEDIRS), $(wildcard $(D)/*.c))
 OBJECTS=$(patsubst %.c,%.o,$(CFILES))

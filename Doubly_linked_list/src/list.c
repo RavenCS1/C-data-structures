@@ -1,96 +1,92 @@
 #include "list.h"
 
-int i = 1;
-
-int rand_i(int a, int b){
-	return (a + rand() % (b - a + 1));
-}
-
-node* create(int key){
+node* create(int32_t key){
 	node* new = malloc(sizeof(*new));
 	if(!new){
-		printf("Za mało pamięci na stercie!\n");
-		return 0;
+		(void) printf("Allocation of a new node was unfortunately unsuccesful!\n");
+		exit(EXIT_FAILURE);
 	}
 	new -> value = key;
-	new -> next = 0;
-	new -> prev = 0;
+	new -> next = new -> prev = nullptr;
 	return new;
+}
+
+void print_node(node* x){
+    if(x){
+        (void) printf("Adress of the node: %p\n", (void *)x);
+        (void) printf("Value of the key: %" PRId32 "\n", x -> value);
+        (void) printf("Adress of the previous node: %p\n", (void *)(x -> prev));
+        (void) printf("Adress of the next node: %p\n\n", (void *)(x -> next));
+    }
+    else (void) printf("Invalid pointer! Couldn't print out pieces of information about a node.\n");
+    return;
 }
 
 void print_list_next(node* head){
 	if(!head){
-		printf("Lista jest pusta!\n");
+		(void) printf("List is currently empty!\n\n");
 		return;
 	}
-	for(node* tmp = head; tmp; tmp = tmp -> next){
-		printf("Element nr. %d\n", i++);
-		printf("Wartość: %d\n", tmp -> value);
-		printf("Adres prev: %p\n", tmp -> prev);
-		printf("Adres: %p\n", tmp);
-		printf("Adres next: %p\n\n", tmp -> next);
-	}
-    i--;
+	(void) printf("Printing the list in normal order.\n\n");
+	for(node* iterator = head; iterator; iterator = iterator -> next)
+		print_node(iterator);
 	return;
 }
 
 void print_list_prev(node* head){
 	if(!head){
-		printf("Lista jest pusta!\n");
+		printf("List is currently empty!\n\n");
 		return;
 	}
-    node* tmp = head;
-	for(; tmp -> next; tmp = tmp -> next);
-    for(; tmp; tmp = tmp -> prev){
-		printf("Element nr. %d\n", i--);
-		printf("Wartość: %d\n", tmp -> value);
-		printf("Adres prev: %p\n", tmp -> prev);
-		printf("Adres: %p\n", tmp);
-		printf("Adres next: %p\n\n", tmp -> next);
-	}
-    i++;
+	(void) printf("Printing the list in the reversed order.\n\n");
+    node* iterator = head;
+	for(; iterator -> next; iterator = iterator -> next);
+    for(; iterator; iterator = iterator -> prev)
+		print_node(iterator);
 	return;
 }
 
-node* add_first(node* head, node* element){
-	if(!head)
-		return element;
-	element -> next = head;
-	head -> prev = element;
-	return element;
+node* add_first(node* head, node* elem){
+	if(!head) return elem;
+	elem -> next = head;
+	head -> prev = elem;
+	(void) printf("A new node was added at the beginning of the list!\n\n");
+	print_node(elem);
+	return elem;
 }
 
-node* add_last(node* head, node* element){
-	if(!head)
-		return element;
-	node* tmp = head;
-    for(; tmp -> next; tmp = tmp -> next);
-    tmp -> next = element;
-	element -> prev = tmp;
+node* add_last(node* head, node* elem){
+	if(!head) return elem;
+	node* iterator = head;
+    for(; iterator -> next; iterator = iterator -> next);
+    iterator -> next = elem;
+	elem -> prev = iterator;
+	(void) printf("A new node was added at the end of the list!\n\n");
+	print_node(elem);
 	return head;
 }
 
-node* pull_all_elements(node** head, int var){
+node* pull_all_elements(node** head, int32_t key){
 	if(!(*head)){
-		printf("Lista jest pusta!\n");
-		return 0;
+		(void) printf("List is currently empty!\n\n");
+		return nullptr;
 	}
+	node* new_head = nullptr;
 	node* prev = (*head) -> prev;
-	node* tmp = *head;
 	node* next = (*head) -> next;
-	node* newhead = 0;
-	while(tmp){
-		if(tmp -> value == var){
-			tmp -> next = tmp -> prev = 0;
-			newhead = add_first(newhead, tmp);
+	node* iterator = *head;
+	while(iterator){
+		if(iterator -> value == key){
+			iterator -> next = iterator -> prev = nullptr;
+			new_head = add_first(new_head, iterator);
 			if(!prev){
 				if(next){
 					next -> prev = prev;
                     *head = next;
                 }
 				else{
-			        *head = 0;
-                    return newhead;  
+			        *head = nullptr;
+                    return new_head;  
                 }
 			}
 			else{
@@ -98,269 +94,270 @@ node* pull_all_elements(node** head, int var){
 					prev -> next = next;
 					next -> prev = prev;
 				}
-				else
-					prev -> next = next;
+				else prev -> next = next;
 			}
 		}
-		tmp = next;
-		if(tmp){
-			prev = tmp -> prev;
-			next = tmp -> next;
+		iterator = next;
+		if(iterator){
+			prev = iterator -> prev;
+			next = iterator -> next;
 		}
 	}
-	return newhead;
+	(void) printf("All nodes with the key value of: %" PRId32 " were extracted from the original list\n\n", key);
+	return new_head;
 }
 
-node* pull_one_element(node** head, int var){
+node* pull_one_element(node** head, int32_t key){
 	if(!(*head)){
-		printf("Lista jest pusta!\n");
-		return 0;
+		(void) printf("List is currently empty!\n\n");
+		return nullptr;
 	}
 	node* prev = (*head) -> prev;
-	node* tmp = *head;
 	node* next = (*head) -> next;
-	while(tmp && (tmp -> value != var)){
-		tmp = next;
-		if(tmp){
-			prev = tmp -> prev;
-			next = tmp -> next;
+	node* iterator = *head;
+	while(iterator && (iterator -> value != key)){
+		iterator = next;
+		if(iterator){
+			prev = iterator -> prev;
+			next = iterator -> next;
 		}
 	}
-	if(tmp){
-        if(tmp == *head) *head = next;
+	if(iterator){
+        if(iterator == *head) *head = next;
 		if(prev) prev -> next = next;
 		if(next) next -> prev = prev;
-        tmp -> next = tmp -> prev = 0;
-		return tmp;
+        iterator -> next = iterator -> prev = nullptr;
+		(void) printf("A node was extracted from the list\n\n");
+		print_node(iterator);
+		return iterator;
 	}
-	return 0;
+	return nullptr;
 }
 
-void add_sort(node** head, node* element){
+void add_sort(node** head, node* elem){
 	if(!(*head)){
-		*head = element;
+		*head = elem;
 		return;
 	}
-	node* tmp = *head;
-	if(element -> value <= tmp -> value){
-		*head = element;
-		element -> next = tmp;
-		tmp -> prev = element;
+	node* iterator = *head;
+	if(elem -> value <= iterator -> value){
+		*head = elem;
+		elem -> next = iterator;
+		iterator -> prev = elem;
 		return;
 	}
-	node* prev = tmp;
-	tmp = tmp -> next;
-	while(tmp){
-		if(element -> value <= tmp -> value){
-			prev -> next = element;
-			element -> prev = prev;
-			element -> next = tmp;
-			tmp -> prev = element;
+	node* prev = iterator;
+	iterator = iterator -> next;
+	while(iterator){
+		if(elem -> value <= iterator -> value){
+			prev -> next = elem;
+			elem -> prev = prev;
+			elem -> next = iterator;
+			iterator -> prev = elem;
 			return;		
 		}
-		prev = tmp;
-		tmp = tmp -> next;
+		prev = iterator;
+		iterator = iterator -> next;
 	}
-	prev -> next = element;
-	element -> prev = prev;
+	prev -> next = elem;
+	elem -> prev = prev;
+	(void) printf("A new node was added in the sorted order!\n\n");
+	print_node(elem);
 	return;			
 }
 
 void sort_divided(node** head){
-    if(!((*head) -> next)){
-        return;
-    }
-    bool flag = false;
-	node* tmphead = *head;
-	node* tmpwstaw, *prevwstaw, *prev, *next;
-	for(node* tmp = tmphead -> next; tmp; tmp = next){
-		prev = tmp -> prev;
-		next = tmp -> next;
-		tmpwstaw = tmphead;
-		prevwstaw = tmphead -> prev;
-		if(tmp -> value % 2 == 0){
-			while((tmpwstaw) && (tmpwstaw -> value % 2 == 0) && 
-                  (tmpwstaw -> value <= tmp -> value)){
-				prevwstaw = tmpwstaw;
-				tmpwstaw = tmpwstaw -> next;
+    if(!((*head) -> next)) return;
+    bool check = false;
+	node* tmp_head = *head;
+	node* tmp_insert, *prev_insert, *prev, *next;
+	for(node* iterator = tmp_head -> next; iterator; iterator = next){
+		prev = iterator -> prev;
+		next = iterator -> next;
+		tmp_insert = tmp_head;
+		prev_insert = tmp_head -> prev;
+		if(iterator -> value % 2 == 0){
+			while((tmp_insert) && (tmp_insert -> value % 2 == 0) && 
+                  (tmp_insert -> value <= iterator -> value)){
+				prev_insert = tmp_insert;
+				tmp_insert = tmp_insert -> next;
 			}
-            if(prevwstaw != tmp){
+            if(prev_insert != iterator){
 			    prev -> next = next;
 			    if(next) next -> prev = prev;
-			    if(!prevwstaw){
-				    tmphead = tmp;
-				    tmp -> prev = 0;
-				    tmp -> next = tmpwstaw;
-                    tmpwstaw -> prev = tmp;
-                    flag = true;
+			    if(!prev_insert){
+				    tmp_head = iterator;
+				    iterator -> prev = nullptr;
+				    iterator -> next = tmp_insert;
+                    tmp_insert -> prev = iterator;
+                    check = true;
 			    }
 			    else{
-				    prevwstaw -> next = tmp;
-				    tmp -> prev = prevwstaw;
-				    if(tmpwstaw)
-                        tmpwstaw -> prev = tmp;
-				    tmp -> next = tmpwstaw;
+				    prev_insert -> next = iterator;
+				    iterator -> prev = prev_insert;
+				    if(tmp_insert) tmp_insert -> prev = iterator;
+				    iterator -> next = tmp_insert;
 			    }
             }
 		}
 		else{
-            if(flag == false){
-			    while(tmpwstaw && (tmpwstaw -> value <= tmp -> value) &&
-                      ((tmpwstaw -> value % 2 == 1) || (tmpwstaw -> value % 2 == -1))){
-				    prevwstaw = tmpwstaw;
-				    tmpwstaw = tmpwstaw -> next;
+            if(check == false){
+			    while(tmp_insert && (tmp_insert -> value <= iterator -> value) &&
+                      ((tmp_insert -> value % 2 == 1) || (tmp_insert -> value % 2 == -1))){
+				    prev_insert = tmp_insert;
+				    tmp_insert = tmp_insert -> next;
 			    }
             }
             else{
-			    while((tmpwstaw) && 
-                      ((tmpwstaw -> value % 2 == 0) || (tmpwstaw -> value <= tmp -> value))){
-				    prevwstaw = tmpwstaw;
-				    tmpwstaw = tmpwstaw -> next;
+			    while((tmp_insert) && 
+                      ((tmp_insert -> value % 2 == 0) || (tmp_insert -> value <= iterator -> value))){
+				    prev_insert = tmp_insert;
+				    tmp_insert = tmp_insert -> next;
 			    }
             }
-            if(prevwstaw != tmp){
+            if(prev_insert != iterator){
 			    prev -> next = next;
 			    if(next) next -> prev = prev;
-			    if(!prevwstaw){
-				    tmphead = tmp;
-				    tmp -> prev = 0;
-				    tmp -> next = tmpwstaw;
-                    tmpwstaw -> prev = tmp;
+			    if(!prev_insert){
+				    tmp_head = iterator;
+				    iterator -> prev = nullptr;
+				    iterator -> next = tmp_insert;
+                    tmp_insert -> prev = iterator;
 			    }
 			    else{
-				    prevwstaw -> next = tmp;
-				    tmp -> prev = prevwstaw;
-				    if(tmpwstaw)
-                        tmpwstaw -> prev = tmp;
-				    tmp -> next = tmpwstaw;
+				    prev_insert -> next = iterator;
+				    iterator -> prev = prev_insert;
+				    if(tmp_insert)
+                        tmp_insert -> prev = iterator;
+				    iterator -> next = tmp_insert;
 			    }
             }
 		}
 	}
-    *head = tmphead;
+    *head = tmp_head;
+	(void) printf("List was sorted in the divided order (first even numbers, then odd)!\n\n");
 	return;
 }
 
-void sort_notdivided(node** head){
-    if(!((*head) -> next)){
-        return;
-    }
-    bool flag = false;
-	node* tmphead = *head;
-	node* tmpwstaw, *prevwstaw, *prev, *next;
-	for(node* tmp = tmphead -> next; tmp; tmp = next){
-		prev = tmp -> prev;
-		next = tmp -> next;
-		tmpwstaw = tmphead;
-		prevwstaw = tmphead -> prev;
-		if((tmp -> value % 2 == 1) || (tmp -> value % 2 == -1)){
-			while((tmpwstaw) && (tmpwstaw -> value <= tmp -> value) &&
-                  ((tmpwstaw -> value % 2 == 1) || (tmpwstaw -> value % 2 == -1))){
-				prevwstaw = tmpwstaw;
-				tmpwstaw = tmpwstaw -> next;
+void sort_reversed_divided(node** head){
+    if(!((*head) -> next)) return;
+    bool check = false;
+	node* tmp_head = *head;
+	node* tmp_insert, *prev_insert, *prev, *next;
+	for(node* iterator = tmp_head -> next; iterator; iterator = next){
+		prev = iterator -> prev;
+		next = iterator -> next;
+		tmp_insert = tmp_head;
+		prev_insert = tmp_head -> prev;
+		if((iterator -> value % 2 == 1) || (iterator -> value % 2 == -1)){
+			while((tmp_insert) && (tmp_insert -> value <= iterator -> value) &&
+                  ((tmp_insert -> value % 2 == 1) || (tmp_insert -> value % 2 == -1))){
+				prev_insert = tmp_insert;
+				tmp_insert = tmp_insert -> next;
 			}
-            if(prevwstaw != tmp){
+            if(prev_insert != iterator){
 			    prev -> next = next;
 			    if(next) next -> prev = prev;
-			    if(!prevwstaw){
-				    tmphead = tmp;
-				    tmp -> prev = 0;
-				    tmp -> next = tmpwstaw;
-                    tmpwstaw -> prev = tmp;
-                    flag = true;
+			    if(!prev_insert){
+				    tmp_head = iterator;
+				    iterator -> prev = nullptr;
+				    iterator -> next = tmp_insert;
+                    tmp_insert -> prev = iterator;
+                    check = true;
 			    }
 			    else{
-				    prevwstaw -> next = tmp;
-				    tmp -> prev = prevwstaw;
-				    if(tmpwstaw)
-                        tmpwstaw -> prev = tmp;
-				    tmp -> next = tmpwstaw;
+				    prev_insert -> next = iterator;
+				    iterator -> prev = prev_insert;
+				    if(tmp_insert) tmp_insert -> prev = iterator;
+				    iterator -> next = tmp_insert;
 			    }
             }
 		}
 		else{
-            if(!flag){
-			    while((tmpwstaw) && (tmpwstaw -> value % 2 == 0) && 
-                      (tmpwstaw -> value <= tmp -> value)){
-				    prevwstaw = tmpwstaw;
-				    tmpwstaw = tmpwstaw -> next;
+            if(!check){
+			    while((tmp_insert) && (tmp_insert -> value % 2 == 0) && 
+                      (tmp_insert -> value <= iterator -> value)){
+				    prev_insert = tmp_insert;
+				    tmp_insert = tmp_insert -> next;
 			    }
             }
             else{
-			    while((tmpwstaw) && ((tmpwstaw -> value % 2 == 1) ||  
-                      (tmpwstaw -> value % 2 == -1) || (tmpwstaw -> value <= tmp -> value))){
-				    prevwstaw = tmpwstaw;
-				    tmpwstaw = tmpwstaw -> next;
+			    while((tmp_insert) && ((tmp_insert -> value % 2 == 1) ||  
+                      (tmp_insert -> value % 2 == -1) || (tmp_insert -> value <= iterator -> value))){
+				    prev_insert = tmp_insert;
+				    tmp_insert = tmp_insert -> next;
 			    }
             }
-            if(prevwstaw != tmp){
+            if(prev_insert != iterator){
 			    prev -> next = next;
 			    if(next) next -> prev = prev;
-			    if(!prevwstaw){
-				    tmphead = tmp;
-				    tmp -> prev = 0;
-				    tmp -> next = tmpwstaw;
-                    tmpwstaw -> prev = tmp;
+			    if(!prev_insert){
+				    tmp_head = iterator;
+				    iterator -> prev = nullptr;
+				    iterator -> next = tmp_insert;
+                    tmp_insert -> prev = iterator;
 			    }
 			    else{
-				    prevwstaw -> next = tmp;
-				    tmp -> prev = prevwstaw;
-				    if(tmpwstaw)
-                        tmpwstaw -> prev = tmp;
-				    tmp -> next = tmpwstaw;
+				    prev_insert -> next = iterator;
+				    iterator -> prev = prev_insert;
+				    if(tmp_insert) tmp_insert -> prev = iterator;
+				    iterator -> next = tmp_insert;
 			    }
             }
 		}
 	}
-    *head = tmphead;
+    *head = tmp_head;
+	(void) printf("List was sorted in the reversed divided order (first odd numbers, then even)!\n\n");
 	return;
 }
 
 void sort(node** head){
-    if(!((*head) -> next)){
-        return;
-    }
-	node* tmphead = *head;
-	node* tmpwstaw, *prevwstaw, *prev, *next;
-	for(node* tmp = tmphead -> next; tmp; tmp = next){
-		prev = tmp -> prev;
-		next = tmp -> next;
-		tmpwstaw = tmphead;
-		prevwstaw = tmphead -> prev;
-	    while(tmpwstaw && (tmpwstaw -> value <= tmp -> value)){
-		    prevwstaw = tmpwstaw;
-			tmpwstaw = tmpwstaw -> next;
+    if(!((*head) -> next)) return;
+	node* tmp_head = *head;
+	node* tmp_insert, *prev_insert, *prev, *next;
+	for(node* iterator = tmp_head -> next; iterator; iterator = next){
+		prev = iterator -> prev;
+		next = iterator -> next;
+		tmp_insert = tmp_head;
+		prev_insert = tmp_head -> prev;
+	    while(tmp_insert && (tmp_insert -> value <= iterator -> value)){
+		    prev_insert = tmp_insert;
+			tmp_insert = tmp_insert -> next;
 		}
-        if(prevwstaw != tmp){
+        if(prev_insert != iterator){
 		    prev -> next = next;
 		    if(next) next -> prev = prev;
-		    if(!prevwstaw){
-			    tmphead = tmp;
-			    tmp -> prev = 0;
-			    tmp -> next = tmpwstaw;
-                tmpwstaw -> prev = tmp;
+		    if(!prev_insert){
+			    tmp_head = iterator;
+			    iterator -> prev = nullptr;
+			    iterator -> next = tmp_insert;
+                tmp_insert -> prev = iterator;
 		    }
 		    else{
-			    prevwstaw -> next = tmp;
-			    tmp -> prev = prevwstaw;
-			    if(tmpwstaw)
-                    tmpwstaw -> prev = tmp;
-			    tmp -> next = tmpwstaw;
+			    prev_insert -> next = iterator;
+			    iterator -> prev = prev_insert;
+			    if(tmp_insert) tmp_insert -> prev = iterator;
+			    iterator -> next = tmp_insert;
 		    }
         }
 	}
-    *head = tmphead;
+    *head = tmp_head;
+	(void) printf("List was sorted in a normal order!\n\n");
 	return;
 }
 
 void free_list(node** head){
-	node* tmp = 0;
+	node* handle = nullptr;
 	while(*head){
-		tmp = *head;
+		handle = *head;
 		*head = (*head) -> next;
-		free(tmp);
+		(void) printf("Deallocation of a node:\n\n");
+		print_node(handle);
+		memset(handle, 0, sizeof(*handle));
+		free(handle);
 	}
-	tmp = 0;
+	handle = nullptr;
+	return;
 }
 
 

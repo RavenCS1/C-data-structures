@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(Huffman_coding C)
 
-set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
 option(BUILD_TESTS "Build unit tests" OFF)
@@ -12,9 +12,9 @@ option(ENABLE_OPTIMIZATIONS "Enable -O2 optimizations" ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_options(-Wall -Wextra -Wpedantic -g -O0)
+    add_compile_options(-std=c2x -Wall -Wextra -Wpedantic -g -O0)
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-    add_compile_options(-Wall -Wextra -O2 -DNDEBUG)
+    add_compile_options(-std=c2x -Wall -Wextra -O2 -DNDEBUG)
 endif()
 
 if(ENABLE_SANITIZERS)
