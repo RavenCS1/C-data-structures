@@ -1,7 +1,4 @@
-# C Data Structures & Tricks 
-[![Red-black Tree](https://img.shields.io/badge/Red-black_tree-%23dc2626)](Red_black_tree)
-[![Huffman](https://img.shields.io/badge/Huffman-Tree-green)](Huffman_coding)
-![C](https://img.shields.io/badge/C-C99-blue) ![CMake](https://img.shields.io/badge/CMake-3.20-blue) ![Standards](https://img.shields.io/badge/std-c11-orange)
+# C Data Structures & Algorithms
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
